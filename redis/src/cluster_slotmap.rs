@@ -69,7 +69,9 @@ impl SlotMap {
         );
         this
     }
-
+    pub fn get_slots_map_values(&self) -> BTreeMap<u16, SlotMapValue> {
+        refcellself.slots
+    }
     pub fn slot_value_for_route(&self, route: &Route) -> Option<&SlotMapValue> {
         let slot = route.slot();
         self.slots

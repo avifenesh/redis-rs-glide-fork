@@ -239,6 +239,11 @@ where
         Ok(connection)
     }
 
+    /// Returns the slot map.
+    pub fn get_slot_map(&self) -> RefCell<SlotMap> {
+        self.slots
+    }
+
     /// Set an auto reconnect attribute.
     /// Default value is true;
     pub fn set_auto_reconnect(&self, value: bool) {

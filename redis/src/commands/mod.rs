@@ -12,6 +12,7 @@ mod macros;
 #[cfg(feature = "json")]
 #[cfg_attr(docsrs, doc(cfg(feature = "json")))]
 mod json;
+mod cluster_scan;
 
 #[cfg(feature = "json")]
 pub use json::JsonCommands;
