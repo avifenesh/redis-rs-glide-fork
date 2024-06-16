@@ -310,7 +310,7 @@ impl ResponsePolicy {
             | b"CLIENT SETINFO" | b"CONFIG SET" | b"CONFIG RESETSTAT" | b"CONFIG REWRITE"
             | b"FLUSHALL" | b"FLUSHDB" | b"FUNCTION DELETE" | b"FUNCTION FLUSH"
             | b"FUNCTION LOAD" | b"FUNCTION RESTORE" | b"MEMORY PURGE" | b"MSET" | b"PING"
-            | b"SCRIPT FLUSH" | b"SCRIPT LOAD" | b"SLOWLOG RESET" => {
+            | b"SCRIPT FLUSH" | b"SCRIPT LOAD" | b"SLOWLOG RESET" | b"UNWATCH" | b"WATCH" => {
                 Some(ResponsePolicy::AllSucceeded)
             }
 
@@ -378,11 +378,14 @@ fn base_routing(cmd: &[u8]) -> RouteBy {
         | b"PING"
         | b"SCRIPT EXISTS"
         | b"SCRIPT KILL"
+        | b"UNWATCH"
         | b"WAIT"
         | b"RANDOMKEY"
         | b"WAITAOF" => RouteBy::AllPrimaries,
 
-        b"MGET" | b"DEL" | b"EXISTS" | b"UNLINK" | b"TOUCH" => RouteBy::MultiShardNoValues,
+        b"MGET" | b"DEL" | b"EXISTS" | b"UNLINK" | b"TOUCH" | b"WATCH" => {
+            RouteBy::MultiShardNoValues
+        }
         b"MSET" => RouteBy::MultiShardWithValues,
 
         // TODO - special handling - b"SCAN"
@@ -453,6 +456,7 @@ fn base_routing(cmd: &[u8]) -> RouteBy {
         | b"CONFIG GET"
         | b"DEBUG"
         | b"ECHO"
+        | b"FUNCTION LIST"
         | b"LASTSAVE"
         | b"LOLWUT"
         | b"MODULE LIST"
@@ -607,11 +611,15 @@ pub fn is_readonly_cmd(cmd: &[u8]) -> bool {
             | b"BITPOS"
             | b"DBSIZE"
             | b"DUMP"
-            | b"EVALSHA_RO"
             | b"EVAL_RO"
+            | b"EVALSHA_RO"
             | b"EXISTS"
             | b"EXPIRETIME"
             | b"FCALL_RO"
+            | b"FUNCTION DUMP"
+            | b"FUNCTION KILL"
+            | b"FUNCTION LIST"
+            | b"FUNCTION STATS"
             | b"GEODIST"
             | b"GEOHASH"
             | b"GEOPOS"
@@ -650,6 +658,11 @@ pub fn is_readonly_cmd(cmd: &[u8]) -> bool {
             | b"RANDOMKEY"
             | b"SCAN"
             | b"SCARD"
+            | b"SCRIPT DEBUG"
+            | b"SCRIPT EXISTS"
+            | b"SCRIPT FLUSH"
+            | b"SCRIPT KILL"
+            | b"SCRIPT LOAD"
             | b"SDIFF"
             | b"SINTER"
             | b"SINTERCARD"
